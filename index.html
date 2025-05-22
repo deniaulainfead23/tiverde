@@ -7,7 +7,7 @@
   <script>
     google.charts.load('current', {
       packages: ['corechart', 'geochart'],
-      mapsApiKey: 'AIzaSyAliNh8RMUALQd155wa0Enr45t_wnwMGlw' // Sua chave da API
+      mapsApiKey: 'XXXXXXXXXXXXXX' // Sua chave da API
     });
 
     google.charts.setOnLoadCallback(drawDashboard);
@@ -27,7 +27,7 @@
         SC: 'Santa Catarina'
       };
 
-      fetch('https://docs.google.com/spreadsheets/d/e/2PACX-1vRPQVNUrlcqu_UpF0N_nGQYvXDFs8yDue2WHVK30tRTsg5aRWgKXx1_Ok5OkMHrqA/pub?output=csv')
+      fetch('https://docs.google.com/spreadsheets/d/e/2PACX-1vRPQVNUrlcqu_UpF0N_nGQYvXDFs8yDue2WHVK30tRTsg5aRWgKXx1_Ok5OkMHrqA/pub?output=csv')// Sua planilha
         .then(response => response.text())
         .then(csvText => {
           const linhas = csvText.trim().split('\n');
