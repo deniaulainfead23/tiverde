@@ -7,12 +7,26 @@
   <script>
     google.charts.load('current', {
       packages: ['corechart', 'geochart'],
-      mapsApiKey: 'AIzaSyAliNh8RMUALQd155wa0Enr45t_wnwMGlw' // sua chave está correta aqui
+      mapsApiKey: 'AIzaSyAliNh8RMUALQd155wa0Enr45t_wnwMGlw' // Sua chave da API
     });
 
     google.charts.setOnLoadCallback(drawDashboard);
 
     function drawDashboard() {
+      // Mapeia siglas para nomes completos dos estados
+      const estados = {
+        SP: 'São Paulo',
+        RJ: 'Rio de Janeiro',
+        MG: 'Minas Gerais',
+        RS: 'Rio Grande do Sul',
+        BA: 'Bahia',
+        PR: 'Paraná',
+        PE: 'Pernambuco',
+        CE: 'Ceará',
+        PA: 'Pará',
+        SC: 'Santa Catarina'
+      };
+
       fetch('https://docs.google.com/spreadsheets/d/e/2PACX-1vRPQVNUrlcqu_UpF0N_nGQYvXDFs8yDue2WHVK30tRTsg5aRWgKXx1_Ok5OkMHrqA/pub?output=csv')
         .then(response => response.text())
         .then(csvText => {
@@ -25,10 +39,10 @@
 
           for (let i = 1; i < linhas.length; i++) {
             const campos = linhas[i].split(',');
-            data.addRow([
-              campos[0],
-              parseInt(campos[2].replace(/\D/g, '')) // Remover pontos e formatar número
-            ]);
+            const estado = campos[0];
+            const matriculados = parseInt(campos[2].replace(/\D/g, ''));
+
+            data.addRow([estado, matriculados]);
           }
 
           const chart1 = new google.visualization.ColumnChart(document.getElementById('grafico_alunos'));
@@ -47,10 +61,11 @@
 
           for (let i = 1; i < linhas.length; i++) {
             const campos = linhas[i].split(',');
-            geoData.addRow([
-              campos[0],
-              parseFloat(campos[3].replace(',', '.'))
-            ]);
+            const sigla = campos[0];
+            const evasao = parseFloat(campos[3].replace(',', '.'));
+            const nomeCompleto = estados[sigla] || sigla;
+
+            geoData.addRow([nomeCompleto, evasao]);
           }
 
           const geoChart = new google.visualization.GeoChart(document.getElementById('mapa_evasao'));
