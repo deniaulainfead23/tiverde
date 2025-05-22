@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Dashboard Educacional</title>
+  <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+  <script>
+    google.charts.load('current', {
+      packages: ['corechart', 'geochart'],
+      mapsApiKey: 'AIzaSyAliNh8RMUALQd155wa0Enr45t_wnwMGlw' // sua chave está correta aqui
+    });
+
+    google.charts.setOnLoadCallback(drawDashboard);
+
+    function drawDashboard() {
+      fetch('https://docs.google.com/spreadsheets/d/e/2PACX-1vRPQVNUrlcqu_UpF0N_nGQYvXDFs8yDue2WHVK30tRTsg5aRWgKXx1_Ok5OkMHrqA/pub?output=csv')
+        .then(response => response.text())
+        .then(csvText => {
+          const linhas = csvText.trim().split('\n');
+          const cabecalho = linhas[0].split(',');
+          const data = new google.visualization.DataTable();
+          
+          data.addColumn('string', cabecalho[0]); // Estado
+          data.addColumn('number', cabecalho[2]); // Alunos Matriculados
+
+          for (let i = 1; i < linhas.length; i++) {
+            const campos = linhas[i].split(',');
+            data.addRow([
+              campos[0],
+              parseInt(campos[2].replace(/\D/g, '')) // Remover pontos e formatar número
+            ]);
+          }
+
+          const chart1 = new google.visualization.ColumnChart(document.getElementById('grafico_alunos'));
+          chart1.draw(data, {
+            title: 'Alunos Matriculados por Estado',
+            hAxis: { title: 'Estado' },
+            vAxis: { title: 'Alunos Matriculados' },
+            legend: 'none',
+            colors: ['#3366cc']
+          });
+
+          // Mapa Geográfico: Taxa de Evasão
+          const geoData = new google.visualization.DataTable();
+          geoData.addColumn('string', 'Estado');
+          geoData.addColumn('number', 'Taxa de Evasão (%)');
+
+          for (let i = 1; i < linhas.length; i++) {
+            const campos = linhas[i].split(',');
+            geoData.addRow([
+              campos[0],
+              parseFloat(campos[3].replace(',', '.'))
+            ]);
+          }
+
+          const geoChart = new google.visualization.GeoChart(document.getElementById('mapa_evasao'));
+          geoChart.draw(geoData, {
+            region: 'BR',
+            displayMode: 'regions',
+            resolution: 'provinces',
+            colorAxis: { colors: ['#e0f3f8', '#08306b'] },
+            backgroundColor: '#f5f5f5',
+            datalessRegionColor: '#ffffff'
+          });
+        });
+    }
+  </script>
+</head>
+<body>
+  <h2 style="text-align:center;">📊 Dashboard Educacional Integrado com Google Sheets</h2>
+  <div id="grafico_alunos" style="width: 90%; height: 400px; margin: auto;"></div>
+  <br>
+  <div id="mapa_evasao" style="width: 90%; height: 500px; margin: auto;"></div>
+</body>
+</html>
